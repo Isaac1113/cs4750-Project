@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "864824869771",
+    "project_id": "cs4750-fomo-app",
+    "storage_bucket": "cs4750-fomo-app.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:864824869771:android:c30cda9ceed12254ca258e",
+        "android_client_info": {
+          "package_name": "edu.cpp.cs4750.idiaz.project.fomo_app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "864824869771-p8l3t01jg5ltoevqm1873sptc7f6iqau.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAfL_KB1jHGy2p0J_NP_t3kyYlyrB6f9y4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "864824869771-p8l3t01jg5ltoevqm1873sptc7f6iqau.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
