@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:fomo_app/home_page.dart';
 import 'package:fomo_app/signup_page.dart';
 
 class LoginPage extends StatefulWidget {
@@ -82,7 +83,11 @@ class _LoginPageState extends State<LoginPage> {
                           FirebaseAuth.instance.signInWithEmailAndPassword(
                               email: emailController.text, password: passwordController.text)
                               .then((value) {
-                                print("Successfully logged user, ${emailController.text} in!" );
+                                print("Successfully logged user ${emailController.text} in!" );
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(builder: (context) => const HomePage())
+                                );
                           }).catchError((error) {
                             print("Failed to log ${emailController.text} in!");
                             print(error);
@@ -127,6 +132,34 @@ class _LoginPageState extends State<LoginPage> {
                         },
                         child: Text(
                           'Sign Up',
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        style: ButtonStyle(
+                            shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                                RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(23.0),
+                                  side: BorderSide(color: Colors.blue),
+                                )
+                            )
+                        ),
+                      ),
+                    ),
+                    Container(
+                      margin: EdgeInsets.only(top: 10, bottom: 10),
+                      width: 150,
+                      height: 50,
+                      child: ElevatedButton(
+                        onPressed: () {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (context) => const HomePage())
+                          );
+                        },
+                        child: Text(
+                          'Test Home',
                           style: TextStyle(
                             fontSize: 20,
                             fontWeight: FontWeight.bold,
