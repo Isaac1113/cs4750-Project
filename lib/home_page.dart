@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'tab_item.dart';
 import 'signup_page.dart';
@@ -11,6 +13,35 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
 
+  Future<Map<String, dynamic>> getUserProfile() async {
+    var userProfile;
+
+    await FirebaseFirestore.instance.collection('Users').doc(userID.toString()).get().then((value) {
+      print("Successfully got the user data");
+      print(value.data());
+      userProfile = value.data();
+      print(userProfile["username"]);
+      FirebaseFirestore.instance.collection('Games').where(FieldPath.documentId, whereIn: userProfile["library"]).get()
+          .then((querySS) {
+        print("Successfully got all Games from database");
+        querySS.docs.forEach((element) {
+          print(element.id);
+          print(element.data());
+        });
+      }).catchError((error) {
+        print("Failed to get all Games from database");
+        print(error);
+      });
+    }).catchError((error) {
+      print("Failed to get the user data");
+      print(error);
+    });
+
+    return userProfile;
+  }
+
+  var userID;
+  var userProfile;
   int _selectedIndex = 0;
 
   static const TextStyle optionStyle = TextStyle(
@@ -18,7 +49,34 @@ class _HomePageState extends State<HomePage> {
     fontWeight: FontWeight.bold,
   );
 
-  _HomePageState() { }
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    userID = FirebaseAuth.instance.currentUser?.uid;
+    print(userID);
+    FirebaseFirestore.instance.collection('Users').doc(userID.toString()).get().then((value) {
+        print("Successfully got the user data");
+        print(value.data());
+        userProfile = value.data();
+        print(userProfile["username"]);
+        FirebaseFirestore.instance.collection('Games').where(FieldPath.documentId, whereIn: userProfile["library"]).get()
+            .then((querySS) {
+          print("Successfully got all Games from database");
+          querySS.docs.forEach((element) {
+            print(element.id);
+            print(element.data());
+          });
+        }).catchError((error) {
+          print("Failed to get all Games from database");
+          print(error);
+        });
+      }).catchError((error) {
+        print("Failed to get the user data");
+        print(error);
+      });
+    // print(userProfile["username"]);
+  }
 
   void _onItemTapped(int index) {
     setState(() {
@@ -28,9 +86,28 @@ class _HomePageState extends State<HomePage> {
 
   Widget selectTab(int index) {
     if (index == 0) {
-      return Text(
-        'Index 0: Home',
-        style: optionStyle,
+      return Scaffold(
+        body: Center(
+          child: Column(
+            children: [
+              Text(
+                (userProfile == null) ? 'My Game Library' : '${userProfile["username"]}\'s Game Library',
+                style: optionStyle,
+              ),
+              Text(
+                'Index 0: Home',
+                style: optionStyle,
+              ),
+            ],
+          ),
+        ),
+        floatingActionButton: FloatingActionButton(
+          onPressed: () {
+
+          },
+          tooltip: 'Add Game',
+          child: const Icon(Icons.add),
+        ),
       );
     }
     else if (index == 1) {
@@ -88,7 +165,6 @@ class _HomePageState extends State<HomePage> {
         centerTitle: true,
       ),
       body: Center(
-          //child: _widgetOptions.elementAt(_selectedIndex),
           child: selectTab(_selectedIndex),
       ),
       bottomNavigationBar: BottomNavigationBar(
@@ -109,7 +185,7 @@ class _HomePageState extends State<HomePage> {
         currentIndex: _selectedIndex,
         selectedItemColor: Colors.red[800],
         onTap: _onItemTapped,
-      )
+      ),
     );
   }
 }
