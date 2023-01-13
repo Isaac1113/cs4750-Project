@@ -13,25 +13,30 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
 
-  Future<Map<String, dynamic>> getUserProfile() async {
-    var userProfile;
+  var userID;
+  var userProfile;
+  var allGames;
+  int _selectedIndex = 0;
 
+  Future<Map<String, dynamic>> getUserProfile() async {
+    userID = FirebaseAuth.instance.currentUser?.uid;
     await FirebaseFirestore.instance.collection('Users').doc(userID.toString()).get().then((value) {
       print("Successfully got the user data");
       print(value.data());
       userProfile = value.data();
       print(userProfile["username"]);
-      FirebaseFirestore.instance.collection('Games').where(FieldPath.documentId, whereIn: userProfile["library"]).get()
-          .then((querySS) {
-        print("Successfully got all Games from database");
-        querySS.docs.forEach((element) {
-          print(element.id);
-          print(element.data());
-        });
-      }).catchError((error) {
-        print("Failed to get all Games from database");
-        print(error);
-      });
+      // FirebaseFirestore.instance.collection('Games').where(FieldPath.documentId, whereIn: userProfile["library"]).get()
+      //     .then((querySS) {
+      //   print("Successfully got all Games from database");
+      //   allGames = querySS.docs;
+      //   querySS.docs.forEach((element) {
+      //     print(element.id);
+      //     print(element.data());
+      //   });
+      // }).catchError((error) {
+      //   print("Failed to get all Games from database");
+      //   print(error);
+      // });
     }).catchError((error) {
       print("Failed to get the user data");
       print(error);
@@ -40,43 +45,37 @@ class _HomePageState extends State<HomePage> {
     return userProfile;
   }
 
-  var userID;
-  var userProfile;
-  int _selectedIndex = 0;
+  Future<dynamic> getGames() async {
+    userID = FirebaseAuth.instance.currentUser?.uid;
+    await FirebaseFirestore.instance.collection('Users').doc(userID.toString()).get().then((value) {
+      print("Successfully in getGames()");
+      print(value.data());
+      userProfile = value.data();
+    }).catchError((error) {
+      print("Failed in getGames()");
+      print(error);
+    });
+    await FirebaseFirestore.instance.collection('Games').where(FieldPath.documentId, whereIn: userProfile["library"]).get()
+        .then((querySS) {
+      print("Successfully got all Games from database");
+      allGames = querySS;
+      print(allGames);
+      querySS.docs.forEach((element) {
+        print(element.id);
+        print(element.data());
+      });
+    }).catchError((error) {
+      print("Failed to get all Games from database");
+      print(error);
+    });
+
+    return allGames;
+  }
 
   static const TextStyle optionStyle = TextStyle(
     fontSize: 30,
     fontWeight: FontWeight.bold,
   );
-
-  @override
-  void initState() {
-    // TODO: implement initState
-    super.initState();
-    userID = FirebaseAuth.instance.currentUser?.uid;
-    print(userID);
-    FirebaseFirestore.instance.collection('Users').doc(userID.toString()).get().then((value) {
-        print("Successfully got the user data");
-        print(value.data());
-        userProfile = value.data();
-        print(userProfile["username"]);
-        FirebaseFirestore.instance.collection('Games').where(FieldPath.documentId, whereIn: userProfile["library"]).get()
-            .then((querySS) {
-          print("Successfully got all Games from database");
-          querySS.docs.forEach((element) {
-            print(element.id);
-            print(element.data());
-          });
-        }).catchError((error) {
-          print("Failed to get all Games from database");
-          print(error);
-        });
-      }).catchError((error) {
-        print("Failed to get the user data");
-        print(error);
-      });
-    // print(userProfile["username"]);
-  }
 
   void _onItemTapped(int index) {
     setState(() {
@@ -90,14 +89,88 @@ class _HomePageState extends State<HomePage> {
         body: Center(
           child: Column(
             children: [
-              Text(
-                (userProfile == null) ? 'My Game Library' : '${userProfile["username"]}\'s Game Library',
-                style: optionStyle,
+              Expanded(
+                flex: 10,
+                child: FutureBuilder(
+                  future: getUserProfile(),
+                  builder: (BuildContext context, AsyncSnapshot<Map<String, dynamic>> snapshot) {
+                    if (snapshot.hasData) {
+                      print(snapshot.data);
+                      return Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            '${snapshot.data!["username"]}\'s Game Library',
+                            style: optionStyle,
+                          ),
+                        ],
+                      );
+                    } else if (snapshot.hasError) {
+                      print(snapshot.data);
+                      return Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                              'My Game Library',
+                              style: optionStyle,
+                            ),
+                        ],
+                      );
+                    } else {
+                      return Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            'Loading User... Game Library',
+                            style: optionStyle,
+                          ),
+                        ],
+                      );
+                    }
+                  },
+                ),
               ),
-              Text(
-                'Index 0: Home',
-                style: optionStyle,
-              ),
+              Expanded(
+                flex: 90,
+                child: FutureBuilder(
+                  future: getGames(),
+                  builder: (context, snapshot) {
+                    if (snapshot.hasData) {
+                      var myList = snapshot.data?.docs;
+                      snapshot.data?.docs.forEach((element) {
+                        print(element.id);
+                        print(element.data());
+                      });
+
+                      return ListView.builder(
+                          padding: const EdgeInsets.all(8),
+                          itemCount: myList?.length,
+                          itemBuilder: (BuildContext context, int index) {
+                            return Container(
+                              height: 50,
+                              color: Colors.amber[400],
+                              child: Center(child: Text('${myList![index].id}')),
+                            );
+                          }
+                      );
+                    } else if (snapshot.hasError) {
+                      print("Error has occurred here:");
+                      print(snapshot);
+                      return Text("Error");
+                    } else {
+                      return Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            CircularProgressIndicator(),
+                            Text("Loading..."),
+                          ],
+                        ),
+                      );
+                    }
+                  },
+                ),
+              )
             ],
           ),
         ),
