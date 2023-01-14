@@ -147,37 +147,40 @@ class _HomePageState extends State<HomePage> {
                           padding: const EdgeInsets.all(8),
                           itemCount: myList?.length,
                           itemBuilder: (BuildContext context, int index) {
-                            return ListTile(
-                              onTap: () {
-                                String gameName = myList[index].id;
-                                Navigator.push(
-                                    context,
-                                    MaterialPageRoute(builder: (context) => GamePage(gameTitle: gameName,))
-                                );
-                              },
-                              title: Container(
-                                height: 40,
-                                margin: EdgeInsets.only(top: 5, bottom: 5, left: 15, right: 15),
-                                child: Center(
-                                  child: Row(
-                                    children: [
-                                      Container(
-                                        margin: EdgeInsets.only(right: 20),
-                                        child: Image(
-                                          image: NetworkImage('${myList[index]["logo"]}'),
-                                        ),
+                            return Column(
+                              children: [
+                                ListTile(
+                                  onTap: () {
+                                    String gameName = myList[index].id;
+                                    String logo = myList[index]["logo"];
+                                    Navigator.push(
+                                        context,
+                                        MaterialPageRoute(builder: (context) => GamePage(gameTitle: gameName, gameLogo: logo,))
+                                    );
+                                  },
+                                  title: Container(
+                                    height: 40,
+                                    margin: EdgeInsets.only(top: 5, bottom: 5, left: 15, right: 15),
+                                    child: Center(
+                                      child: Row(
+                                        children: [
+                                          Container(
+                                            margin: EdgeInsets.only(right: 20),
+                                            child: Image(
+                                              image: NetworkImage('${myList[index]["logo"]}'),
+                                            ),
+                                          ),
+                                          Text('${myList[index].id}'),
+                                        ],
                                       ),
-                                      Text('${myList[index].id}'),
-                                    ],
+                                    ),
                                   ),
                                 ),
-                              ),
+                                Divider(
+                                  thickness: 2,
+                                ),
+                              ],
                             );
-                            // return Container(
-                            //   height: 50,
-                            //   color: Colors.amber[400],
-                            //   child: Center(child: Text('${myList![index].id} -- ${myList[index]["logo"]} -- ${myList[index]["description"]}')),
-                            // );
                           }
                       );
                     } else if (snapshot.hasError) {

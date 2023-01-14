@@ -2,9 +2,10 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 class GamePage extends StatefulWidget {
-  GamePage({Key? key, this.gameTitle}) : super(key: key);
+  GamePage({Key? key, this.gameTitle, this.gameLogo}) : super(key: key);
 
   final gameTitle;
+  final gameLogo;
 
   @override
   State<GamePage> createState() => _GamePageState();
@@ -13,6 +14,7 @@ class GamePage extends StatefulWidget {
 class _GamePageState extends State<GamePage> {
 
   late String _gameTitle;
+  late String _gameLogo;
   var gameData = <String, dynamic>{
     "dummy" : "data",
   };
@@ -22,6 +24,7 @@ class _GamePageState extends State<GamePage> {
     // TODO: implement initState
     super.initState();
     _gameTitle = widget.gameTitle;
+    _gameLogo = widget.gameLogo;
     gameData = <String, dynamic>{
       "dummy" : "data",
     };
@@ -59,7 +62,7 @@ class _GamePageState extends State<GamePage> {
             Expanded(
               flex: 30,
               child: Image(
-                image: NetworkImage(gameData["logo"]),
+                image: NetworkImage(_gameLogo),
                 fit: BoxFit.cover,
               ),
             ),
@@ -75,7 +78,25 @@ class _GamePageState extends State<GamePage> {
                       height: 45,
                       child: ElevatedButton(
                         onPressed: () {
-
+                          showDialog(
+                              context: context,
+                              builder: (BuildContext context) {
+                                return AlertDialog(
+                                  title: Text('Description:'),
+                                  content: Text(gameData["description"]),
+                                  actions: [
+                                    TextButton(
+                                      child: Text('Close'),
+                                      onPressed: () {
+                                        Navigator.pop(context);
+                                      },
+                                      style: TextButton.styleFrom(
+                                          foregroundColor: Colors.blue
+                                      ),
+                                    )
+                                  ],
+                                );
+                              });
                         },
                         child: Text(
                           'Description of ' + _gameTitle,
@@ -100,7 +121,25 @@ class _GamePageState extends State<GamePage> {
                       height: 45,
                       child: ElevatedButton(
                         onPressed: () {
-
+                          showDialog(
+                              context: context,
+                              builder: (BuildContext context) {
+                                return AlertDialog(
+                                  title: Text('Details:'),
+                                  content: Text(gameData["details"]),
+                                  actions: [
+                                    TextButton(
+                                      child: Text('Close'),
+                                      onPressed: () {
+                                        Navigator.pop(context);
+                                      },
+                                      style: TextButton.styleFrom(
+                                          foregroundColor: Colors.blue
+                                      ),
+                                    )
+                                  ],
+                                );
+                              });
                         },
                         child: Text(
                           'Extra Details of ' + _gameTitle,
@@ -195,10 +234,12 @@ class _GamePageState extends State<GamePage> {
                           ),
                         ),
                         style: ButtonStyle(
+                            backgroundColor: MaterialStatePropertyAll<Color>(Colors.green),
                             shape: MaterialStateProperty.all<RoundedRectangleBorder>(
                                 RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(18.0),
-                                  side: BorderSide(color: Colors.blue),
+
+                                  side: BorderSide(color: Colors.green),
                                 )
                             )
                         ),
