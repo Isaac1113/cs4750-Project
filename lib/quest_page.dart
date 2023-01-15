@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 class QuestPage extends StatefulWidget {
   QuestPage({Key? key, this.gameTitle, this.gameLogo, this.questType, required this.questData}) : super(key: key);
@@ -41,7 +42,7 @@ class _QuestPageState extends State<QuestPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("FOMO Tracker - " + _questType + " Quests"),
+        title: Text(_gameTitle + " Quests"),
         centerTitle: true,
       ),
       body: Center(
@@ -49,7 +50,18 @@ class _QuestPageState extends State<QuestPage> {
           children: [
             Expanded(
               flex: 10,
-                child: Text(_questType + " Quests")
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                        _questType + " Quests",
+                      style: TextStyle(
+                        fontSize: 30,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                )
             ),
             Expanded(
               flex: 90,
@@ -61,8 +73,31 @@ class _QuestPageState extends State<QuestPage> {
                       children: [
                         ListTile(
                               onTap: () {
-                                String questName = _questData[index].id;
-                                print(questName);
+                                showDialog(
+                                    context: context,
+                                    builder: (BuildContext context) {
+                                      var date = DateTime.parse(_questData[index]["endtime"].toDate().toString());
+                                      String formattedDate = DateFormat('yyyy-MM-dd kk:mm').format(date);
+                                      return AlertDialog(
+                                        title: Text(_questData[index].id),
+                                        content: Text(
+                                            "Description: " + _questData[index]["description"]
+                                                + "\n Reward: " + _questData[index]["reward"]
+                                                + "\n EndTime: " + formattedDate
+                                        ),
+                                        actions: [
+                                          TextButton(
+                                            child: Text('Close'),
+                                            onPressed: () {
+                                              Navigator.pop(context);
+                                            },
+                                            style: TextButton.styleFrom(
+                                                foregroundColor: Colors.blue
+                                            ),
+                                          )
+                                        ],
+                                      );
+                                    });
                               },
                               title: Container(
                                 height: 40,
