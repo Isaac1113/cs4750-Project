@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:fomo_app/quest_page.dart';
 
 class GamePage extends StatefulWidget {
   GamePage({Key? key, this.gameTitle, this.gameLogo}) : super(key: key);
@@ -164,7 +165,22 @@ class _GamePageState extends State<GamePage> {
                       height: 45,
                       child: ElevatedButton(
                         onPressed: () {
-
+                          FirebaseFirestore.instance.collection('Games').doc(_gameTitle).collection('Weekly').get()
+                              .then((querySS) {
+                                print("Successfully got the quest data in GamePage");
+                                print(querySS.docs.runtimeType);
+                                querySS.docs.forEach((element) {
+                                  print(element.id);
+                                  print(element.data());
+                                });
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(builder: (context) => QuestPage(gameTitle: _gameTitle, gameLogo: _gameLogo, questType: "Weekly", questData: querySS.docs,))
+                                );
+                          }).catchError((error) {
+                            print("Failed to get the quest data in GamePage");
+                            print(error);
+                          });
                         },
                         child: Text(
                           'Weekly Quests of ' + _gameTitle,
