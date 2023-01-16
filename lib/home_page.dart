@@ -26,18 +26,6 @@ class _HomePageState extends State<HomePage> {
       print(value.data());
       userProfile = value.data();
       print(userProfile["username"]);
-      // FirebaseFirestore.instance.collection('Games').where(FieldPath.documentId, whereIn: userProfile["library"]).get()
-      //     .then((querySS) {
-      //   print("Successfully got all Games from database");
-      //   allGames = querySS.docs;
-      //   querySS.docs.forEach((element) {
-      //     print(element.id);
-      //     print(element.data());
-      //   });
-      // }).catchError((error) {
-      //   print("Failed to get all Games from database");
-      //   print(error);
-      // });
     }).catchError((error) {
       print("Failed to get the user data");
       print(error);
