@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:fomo_app/db_game_page.dart';
 import 'package:fomo_app/game_page.dart';
 import 'tab_item.dart';
 import 'signup_page.dart';
@@ -194,7 +195,10 @@ class _HomePageState extends State<HomePage> {
         ),
         floatingActionButton: FloatingActionButton(
           onPressed: () {
-
+            Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const DatabaseGamesPage())
+            );
           },
           tooltip: 'Add Game',
           child: const Icon(Icons.add),
