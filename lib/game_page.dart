@@ -252,7 +252,7 @@ class _GamePageState extends State<GamePage> {
                   children: [
                     Container(
                       margin: EdgeInsets.only(top: 20, bottom: 20),
-                      width: 150,
+                      width: 250,
                       height: 55,
                       child: ElevatedButton(
                         onPressed: () async {
@@ -277,6 +277,8 @@ class _GamePageState extends State<GamePage> {
                               gameInLibrary = false;
                             }
                             userProfile = value.data();
+                            print("userProfile");
+                            print(userProfile);
                           }).catchError((error) {
                             print("Failed to get user profile in gamePage");
                             print(error);
@@ -303,6 +305,33 @@ class _GamePageState extends State<GamePage> {
                           } else {
                             userLibrary.add(_gameTitle);
                             print(userLibrary);
+                            FirebaseFirestore.instance.collection("Users").doc(userID).set({
+                              "library": userLibrary,
+                              "username": userProfile["username"],
+                            }).then((value) {
+                              print("Successfully added the game to the user library");
+                              showDialog(
+                                  context: context,
+                                  builder: (BuildContext context) {
+                                    return AlertDialog(
+                                      content: Text(_gameTitle + " has been added to your library."),
+                                      actions: [
+                                        TextButton(
+                                          child: Text('Close'),
+                                          onPressed: () {
+                                            Navigator.pop(context);
+                                          },
+                                          style: TextButton.styleFrom(
+                                              foregroundColor: Colors.blue
+                                          ),
+                                        )
+                                      ],
+                                    );
+                                  });
+                            }).catchError((error) {
+                              print("Failed to add game to the user library");
+                              print(error);
+                            });
                           }
                         },
                         child: Text(
@@ -317,7 +346,6 @@ class _GamePageState extends State<GamePage> {
                             shape: MaterialStateProperty.all<RoundedRectangleBorder>(
                                 RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(18.0),
-
                                   side: BorderSide(color: Colors.green),
                                 )
                             )

@@ -32,7 +32,7 @@ class _LoginPageState extends State<LoginPage> {
               Expanded(
                 flex: 20,
                 child: Image(
-                  image: NetworkImage("https://img.freepik.com/free-vector/flat-design-mc-logo-design_23-2149482035.jpg?w=2000"),
+                  image: NetworkImage("https://media.istockphoto.com/id/1326493722/vector/fomo-fear-of-missing-out-wriiten-on-speech-bubbles.jpg?s=612x612&w=0&k=20&c=AJ6xvYjUJRcMfJfmaB_k2U4v2AMV3W8DAGvOgHKcldE="),
                   fit: BoxFit.cover,
                   width: 500,
                 ),
@@ -132,34 +132,6 @@ class _LoginPageState extends State<LoginPage> {
                         },
                         child: Text(
                           'Sign Up',
-                          style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        style: ButtonStyle(
-                            shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                                RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(23.0),
-                                  side: BorderSide(color: Colors.blue),
-                                )
-                            )
-                        ),
-                      ),
-                    ),
-                    Container(
-                      margin: EdgeInsets.only(top: 10, bottom: 10),
-                      width: 150,
-                      height: 50,
-                      child: ElevatedButton(
-                        onPressed: () {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(builder: (context) => const HomePage())
-                          );
-                        },
-                        child: Text(
-                          'Test Home',
                           style: TextStyle(
                             fontSize: 20,
                             fontWeight: FontWeight.bold,

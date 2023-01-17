@@ -3,7 +3,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:fomo_app/db_game_page.dart';
 import 'package:fomo_app/game_page.dart';
-import 'tab_item.dart';
 import 'signup_page.dart';
 
 class HomePage extends StatefulWidget {
@@ -73,6 +72,49 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
+  Widget refresh(var myList) {
+    return ListView.builder(
+        padding: const EdgeInsets.all(8),
+        itemCount: myList?.length,
+        itemBuilder: (BuildContext context, int index) {
+          return Column(
+            children: [
+              ListTile(
+                onTap: () {
+                  String gameName = myList[index].id;
+                  String logo = myList[index]["logo"];
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => GamePage(gameTitle: gameName, gameLogo: logo,))
+                  );
+                },
+                title: Container(
+                  height: 40,
+                  margin: EdgeInsets.only(top: 5, bottom: 5, left: 15, right: 15),
+                  child: Center(
+                    child: Row(
+                      children: [
+                        Container(
+                          margin: EdgeInsets.only(right: 20),
+                          child: Image(
+                            image: NetworkImage('${myList[index]["logo"]}'),
+                          ),
+                        ),
+                        Text('${myList[index].id}'),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+              Divider(
+                thickness: 2,
+              ),
+            ],
+          );
+        }
+    );
+  }
+
   Widget selectTab(int index) {
     if (index == 0) {
       return Scaffold(
@@ -131,51 +173,11 @@ class _HomePageState extends State<HomePage> {
                         print(element.id);
                         print(element.data());
                       });
-
-                      return ListView.builder(
-                          padding: const EdgeInsets.all(8),
-                          itemCount: myList?.length,
-                          itemBuilder: (BuildContext context, int index) {
-                            return Column(
-                              children: [
-                                ListTile(
-                                  onTap: () {
-                                    String gameName = myList[index].id;
-                                    String logo = myList[index]["logo"];
-                                    Navigator.push(
-                                        context,
-                                        MaterialPageRoute(builder: (context) => GamePage(gameTitle: gameName, gameLogo: logo,))
-                                    );
-                                  },
-                                  title: Container(
-                                    height: 40,
-                                    margin: EdgeInsets.only(top: 5, bottom: 5, left: 15, right: 15),
-                                    child: Center(
-                                      child: Row(
-                                        children: [
-                                          Container(
-                                            margin: EdgeInsets.only(right: 20),
-                                            child: Image(
-                                              image: NetworkImage('${myList[index]["logo"]}'),
-                                            ),
-                                          ),
-                                          Text('${myList[index].id}'),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                                Divider(
-                                  thickness: 2,
-                                ),
-                              ],
-                            );
-                          }
-                      );
+                      return refresh(myList);
                     } else if (snapshot.hasError) {
                       print("Error has occurred here:");
                       print(snapshot);
-                      return Text("Error");
+                      return Text("Library is empty");
                     } else {
                       return Center(
                         child: Column(
@@ -205,49 +207,159 @@ class _HomePageState extends State<HomePage> {
         ),
       );
     }
-    else if (index == 1) {
+    else {
       return Column(
-        mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Container(
-            margin: EdgeInsets.only(top: 10, bottom: 10),
-            width: 150,
-            height: 50,
-            child: ElevatedButton(
-              onPressed: () {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => const SignupPage())
-                );
+          Expanded(
+            flex: 10,
+            child: FutureBuilder(
+              future: getUserProfile(),
+              builder: (BuildContext context, AsyncSnapshot<Map<String, dynamic>> snapshot) {
+                if (snapshot.hasData) {
+                  print(snapshot.data);
+                  return Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        '${snapshot.data!["username"]}\'s Game Library',
+                        style: optionStyle,
+                      ),
+                    ],
+                  );
+                } else if (snapshot.hasError) {
+                  print(snapshot.data);
+                  return Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        'My Game Library',
+                        style: optionStyle,
+                      ),
+                    ],
+                  );
+                } else {
+                  return Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        'Loading User... Game Library',
+                        style: optionStyle,
+                      ),
+                    ],
+                  );
+                }
               },
-              child: Text(
-                'Sign Up',
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              style: ButtonStyle(
-                  shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                      RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(23.0),
-                        side: BorderSide(color: Colors.blue),
-                      )
-                  )
+            ),
+          ),
+          Expanded(
+            flex: 70,
+            child: Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Container(
+                    margin: EdgeInsets.only(top: 20, bottom: 20),
+                    width: 350,
+                    height: 45,
+                    child: ElevatedButton(
+                      onPressed: () {
+                        showDialog(
+                            context: context,
+                            builder: (BuildContext context) {
+                              return AlertDialog(
+                                title: Text('Warning!'),
+                                content: Text("Are you sure you want to delete your entire library?"),
+                                actions: [
+                                  TextButton(
+                                    child: Text('Yes'),
+                                    onPressed: () {
+                                      FirebaseFirestore.instance.collection("Users").doc(userID).set({
+                                        "library": [],
+                                        "username": userProfile["username"],
+                                      }).then((value) {
+                                        print("Successfully deleted user's entire library");
+                                      }).catchError((error) {
+                                        print("Failed to delete the user's entire library");
+                                        print(error);
+                                      });
+                                      Navigator.pop(context);
+                                    },
+                                    style: TextButton.styleFrom(
+                                        foregroundColor: Colors.blue
+                                    ),
+                                  ),
+                                  TextButton(
+                                    child: Text('No'),
+                                    onPressed: () {
+                                      Navigator.pop(context);
+                                    },
+                                    style: TextButton.styleFrom(
+                                        foregroundColor: Colors.blue
+                                    ),
+                                  )
+                                ],
+                              );
+                            });
+                      },
+                      child: Text(
+                        'Delete my library',
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      style: ButtonStyle(
+                          shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                              RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12.0),
+                                side: BorderSide(color: Colors.blue),
+                              )
+                          )
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
           ),
-          Text(
-            'Index 1: Notifications',
-            style: optionStyle,
+          Expanded(
+            flex: 20,
+            child: Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Container(
+                    margin: EdgeInsets.only(top: 20, bottom: 20),
+                    width: 350,
+                    height: 45,
+                    child: ElevatedButton(
+                      onPressed: () async {
+                        await FirebaseAuth.instance.signOut();
+                        Navigator.pop(context);
+                      },
+                      child: Text(
+                        'Logout',
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      style: ButtonStyle(
+                          backgroundColor: MaterialStatePropertyAll<Color>(Colors.red),
+                          shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                              RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12.0),
+                                side: BorderSide(color: Colors.red),
+                              )
+                          )
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
           ),
         ],
-      );
-    }
-    else {
-      return Text(
-        'Index 2: Profile',
-        style: optionStyle,
       );
     }
   }
@@ -258,6 +370,22 @@ class _HomePageState extends State<HomePage> {
       appBar: AppBar(
         title: const Text("FOMO Tracker - Home"),
         centerTitle: true,
+        actions: [
+          Container(
+            margin: EdgeInsets.only(right: 10),
+            child: GestureDetector(
+              onTap: () {
+                setState(() {
+
+                });
+              },
+              child: Icon(
+                Icons.refresh,
+                size: 26,
+              ),
+            ),
+          )
+        ],
       ),
       body: Center(
           child: selectTab(_selectedIndex),
@@ -267,10 +395,6 @@ class _HomePageState extends State<HomePage> {
           BottomNavigationBarItem(
             icon: Icon(Icons.home),
             label: 'Home',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.notifications),
-            label: 'Notifications',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.account_circle),

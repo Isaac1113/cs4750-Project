@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
@@ -96,6 +97,15 @@ class _SignupPageState extends State<SignupPage> {
                               .then((value) {
                                 print("Successfully signed up the user!");
                                 print(value.user?.uid);
+                                FirebaseFirestore.instance.collection("Users").doc(value.user?.uid).set({
+                                  "library": [],
+                                  "username": usernameController.text,
+                                }).then((value) {
+                                  print("Successfully added a new user to Firestore");
+                                }).catchError((error) {
+                                  print("Failed to add a new user to Firestore");
+                                  print(error);
+                                });
                                 Navigator.pop(context);
                           }).catchError((error) {
                             print("Failed to sign up the user!");
