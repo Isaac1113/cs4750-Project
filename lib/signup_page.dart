@@ -32,7 +32,7 @@ class _SignupPageState extends State<SignupPage> {
               Expanded(
                 flex: 20,
                 child: Image(
-                  image: NetworkImage("https://img.freepik.com/free-vector/flat-design-mc-logo-design_23-2149482035.jpg?w=2000"),
+                  image: NetworkImage("https://media.istockphoto.com/id/1326493722/vector/fomo-fear-of-missing-out-wriiten-on-speech-bubbles.jpg?s=612x612&w=0&k=20&c=AJ6xvYjUJRcMfJfmaB_k2U4v2AMV3W8DAGvOgHKcldE="),
                   fit: BoxFit.cover,
                   width: 500,
                 ),

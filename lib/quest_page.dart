@@ -105,7 +105,7 @@ class _QuestPageState extends State<QuestPage> {
                                 child: Center(
                                   child: Row(
                                     children: [
-                                      Text('${_questData[index].id}'),
+                                      Text('${_questData[index]["title"]}'),
                                     ],
                                   ),
                                 ),
