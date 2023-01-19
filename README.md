@@ -1,6 +1,6 @@
 # fomo_app
 
-A new Flutter project.
+This project uses flutter to develop an app to help players deal with FOMO, Fear Of Missing Out, in games that they play.
 
 ## Getting Started
 
